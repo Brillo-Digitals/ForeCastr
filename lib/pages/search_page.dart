@@ -18,16 +18,6 @@ class _SearchPageState extends State<SearchPage> {
   bool isLoading = false;
 
   @override
-  void initState() {
-    super.initState();
-    _loadData();
-  }
-
-  void _loadData() async {
-    getBackGrounds(SearchCurrentWeather().code);
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       extendBody: true,
@@ -52,10 +42,13 @@ class _SearchPageState extends State<SearchPage> {
       ),
       body: Stack(
         children: [
-          SizedBox(
-            height: double.infinity,
-            width: double.infinity,
-            child: Image(image: searchBgImage.value, fit: BoxFit.cover),
+          ValueListenableBuilder<ImageProvider>(
+            valueListenable: searchBgImage,
+            builder: (context, image, _) => SizedBox(
+              height: double.infinity,
+              width: double.infinity,
+              child: Image(image: image, fit: BoxFit.cover),
+            ),
           ),
           RefreshIndicator(
             displacement: 20,
@@ -177,9 +170,15 @@ class _SearchPageState extends State<SearchPage> {
                                   child: Padding(
                                     padding: const EdgeInsets.all(20.0),
                                     child: Skeleton.ignore(
-                                      child: Image(
-                                        image: searchBgIllustrator.value,
-                                      ),
+                                      child:
+                                          ValueListenableBuilder<ImageProvider>(
+                                            valueListenable:
+                                                searchBgIllustrator,
+                                            builder: (context, image, _) =>
+                                                Skeleton.ignore(
+                                                  child: Image(image: image),
+                                                ),
+                                          ),
                                     ),
                                   ),
                                 ),
