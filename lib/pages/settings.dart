@@ -5,7 +5,6 @@ import 'package:forecastr/data/notifier.dart';
 import 'package:forecastr/data/search_location.dart';
 import 'package:forecastr/pages/search_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:shared_preferences_android/shared_preferences_android.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -349,6 +348,48 @@ class _SettingsPageState extends State<SettingsPage> {
                               ),
                             ),
                           ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    height: 70,
+                    padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                    decoration: ksettingsDecoration,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Developed by :",
+                          style: TextStyle(
+                            color: Colors.black87,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        Text(
+                          "Adesiyan Uthman Adeolu(Brillo Digitals)",
+                          style: TextStyle(
+                            color: Colors.black87,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        Text(
+                          "Email: Uthmanadesiyan112@gmail.com",
+                          style: TextStyle(
+                            color: Colors.black87,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        Text(
+                          "Phone: +234 8146269699",
+                          style: TextStyle(
+                            color: Colors.black87,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ],
                     ),
