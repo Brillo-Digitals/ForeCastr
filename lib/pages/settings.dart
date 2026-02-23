@@ -4,6 +4,7 @@ import 'package:forecastr/data/json_file.dart';
 import 'package:forecastr/data/notifier.dart';
 import 'package:forecastr/data/search_location.dart';
 import 'package:forecastr/pages/search_page.dart';
+import 'package:forecastr/pages/socials.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -356,41 +357,54 @@ class _SettingsPageState extends State<SettingsPage> {
                     height: 70,
                     padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                     decoration: ksettingsDecoration,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      spacing: 10,
                       children: [
                         Text(
-                          "Developed by :",
+                          "Developed by : ",
                           style: TextStyle(
-                            color: Colors.black87,
                             fontSize: 15,
-                            fontWeight: FontWeight.w600,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                         Text(
-                          "Adesiyan Uthman Adeolu(Brillo Digitals)",
+                          "Uthman Adesiyan Adeolu (Brillo Digitals)",
                           style: TextStyle(
-                            color: Colors.black87,
                             fontSize: 15,
-                            fontWeight: FontWeight.w600,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
-                        Text(
-                          "Email: Uthmanadesiyan112@gmail.com",
-                          style: TextStyle(
-                            color: Colors.black87,
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
-                          ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          spacing: 15,
+                          children: [
+                            Icon(Icons.phone, size: 20),
+                            Text(
+                              "+234 8146269699",
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
                         ),
-                        Text(
-                          "Phone: +234 8146269699",
-                          style: TextStyle(
-                            color: Colors.black87,
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
-                          ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          spacing: 15,
+                          children: [
+                            Icon(Icons.email, size: 20),
+                            Text(
+                              "uthmanadesiyan112@gmail.com",
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
                         ),
+                        SocialButtons(isOneColor: true, color: Colors.black),
                       ],
                     ),
                   ),
