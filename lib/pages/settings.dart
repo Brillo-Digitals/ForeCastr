@@ -98,12 +98,23 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   void changeRecentSearch(String lastCity) async {
-    recentSearchList.value[2] = recentSearchList.value[1];
-    recentSearchList.value[1] = recentSearchList.value[0];
-    recentSearchList.value[0] = lastCity;
-    List<String> recentList = recentSearchList.value;
+    final List<String> currentList = List<String>.from(recentSearchList.value);
+
+    // Remove if already exists to avoid duplicates and move to top
+    currentList.remove(lastCity);
+
+    // Insert at the beginning
+    currentList.insert(0, lastCity);
+
+    // Keep only the last 3 searches
+    if (currentList.length > 3) {
+      currentList.removeRange(3, currentList.length);
+    }
+
+    recentSearchList.value = currentList; // This triggers ValueNotifier
+
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setStringList('recentCity', recentList);
+    await prefs.setStringList('recentCity', currentList);
   }
 
   void _showOverlay(int no) {
@@ -233,31 +244,40 @@ class _SettingsPageState extends State<SettingsPage> {
                   SizedBox(height: 20),
                   Text("Recent Searches: ", style: kBoldTextStyle),
                   SizedBox(height: 10),
-                  Row(
-                    children:
-                        List.generate(3, (index) {
-                              return Expanded(
-                                flex: 1,
-                                child: GestureDetector(
-                                  onTap: () => _searchCityByName(
-                                    recentSearchList.value[index],
+                  ValueListenableBuilder<List<String>>(
+                    valueListenable: recentSearchList,
+                    builder: (context, recentList, _) {
+                      return Row(
+                        children: List.generate(recentList.length, (index) {
+                          return Expanded(
+                            flex: 1,
+                            child: Padding(
+                              padding: const EdgeInsets.only(right: 10),
+                              child: GestureDetector(
+                                onTap: () =>
+                                    _searchCityByName(recentList[index]),
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(
+                                    vertical: 12,
+                                    horizontal: 8,
                                   ),
-                                  child: Container(
-                                    padding: EdgeInsets.all(10),
-                                    decoration: kroundedBoxDecoration,
-                                    child: Center(
-                                      child: Text(
-                                        recentSearchList.value[index],
-                                        style: kNormalTextStyle,
+                                  decoration: kroundedBoxDecoration,
+                                  child: Center(
+                                    child: Text(
+                                      recentList[index],
+                                      style: kNormalTextStyle.copyWith(
+                                        fontSize: 12,
                                       ),
+                                      overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
                                 ),
-                              );
-                            })
-                            .expand((element) => [element, SizedBox(width: 10)])
-                            .toList()
-                          ..removeLast(),
+                              ),
+                            ),
+                          );
+                        }),
+                      );
+                    },
                   ),
                 ],
               ),
@@ -354,57 +374,53 @@ class _SettingsPageState extends State<SettingsPage> {
                     ),
                   ),
                   Container(
-                    height: 70,
-                    padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                    decoration: ksettingsDecoration,
+                    width: double.infinity,
+                    padding: EdgeInsets.all(20),
+                    decoration: ksettingsDecoration.copyWith(
+                      color: Colors.white.withValues(alpha: 0.9),
+                    ),
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      spacing: 10,
                       children: [
                         Text(
-                          "Developed by : ",
+                          "Developed by",
                           style: TextStyle(
-                            fontSize: 15,
+                            fontSize: 14,
+                            color: Colors.black54,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        SizedBox(height: 5),
+                        Text(
+                          "Uthman Adesiyan Adeolu",
+                          style: TextStyle(
+                            fontSize: 18,
                             fontWeight: FontWeight.bold,
+                            color: Colors.black87,
                           ),
                         ),
                         Text(
-                          "Uthman Adesiyan Adeolu (Brillo Digitals)",
+                          "Brillo Digitals",
                           style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                            color: Colors.blueAccent,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          spacing: 15,
-                          children: [
-                            Icon(Icons.phone, size: 20),
-                            Text(
-                              "+234 8146269699",
-                              style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
+                        Divider(height: 30, thickness: 0.5),
+                        _buildContactRow(
+                          Icons.phone_android,
+                          "+234 8146269699",
                         ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          spacing: 15,
-                          children: [
-                            Icon(Icons.email, size: 20),
-                            Text(
-                              "uthmanadesiyan112@gmail.com",
-                              style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
+                        SizedBox(height: 10),
+                        _buildContactRow(
+                          Icons.email_outlined,
+                          "uthmanadesiyan112@gmail.com",
                         ),
-                        SocialButtons(isOneColor: true, color: Colors.black),
+                        SizedBox(height: 20),
+                        SocialButtons(
+                          isOneColor: true,
+                          color: Colors.blueAccent,
+                        ),
                       ],
                     ),
                   ),
@@ -450,6 +466,24 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildContactRow(IconData icon, String text) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(icon, size: 18, color: Colors.black54),
+        SizedBox(width: 10),
+        Text(
+          text,
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: Colors.black87,
+          ),
+        ),
+      ],
     );
   }
 }

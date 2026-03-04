@@ -330,6 +330,7 @@ Future<Position?> getSearchedCurrentLocation() async {
     }
 
     return await Geolocator.getCurrentPosition(
+      // ignore: deprecated_member_use
       desiredAccuracy: LocationAccuracy.high,
     );
   } catch (e) {

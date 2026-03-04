@@ -350,15 +350,12 @@ Future<Position?> getCurrentLocation() async {
   // 3. Get location
   try {
     isLocationGotten.value = true;
-    print("az");
     Position p = await Geolocator.getCurrentPosition(
       // ignore: deprecated_member_use
       desiredAccuracy: LocationAccuracy.high,
     );
-    print(p);
     return p;
   } catch (e) {
-    print("ay");
     isLocationGotten.value = false;
     return null;
   }

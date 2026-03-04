@@ -12,42 +12,48 @@ class SocialButtons extends StatelessWidget {
   final bool isOneColor;
   final Color color;
 
-  // Helper function to handle launching
-  Future<void> _launchSocial(String url) async {
+  Future<void> _launchSocial(BuildContext context, String url) async {
     final Uri uri = Uri.parse(url);
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-    } else {
-      throw 'Could not launch $url';
+    try {
+      final bool launched = await launchUrl(
+        uri,
+        mode: LaunchMode.externalApplication,
+      );
+      // ignore: use_build_context_synchronously
+      if (!launched) _showErrorSnackbar(context);
+    } catch (_) {
+      // ignore: use_build_context_synchronously
+      _showErrorSnackbar(context);
     }
   }
 
-  // 1. Instagram
-  void _openInstagram(String username) {
-    _launchSocial("https://www.instagram.com/$username/");
+  void _showErrorSnackbar(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text("Can't open app, check your internet connection"),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
   }
 
-  // 2. Twitter (X)
-  void _openTwitter(String handle) {
-    _launchSocial("https://twitter.com/$handle");
+  void _openInstagram(BuildContext context, String username) {
+    _launchSocial(context, "https://www.instagram.com/$username/");
   }
 
-  // 3. TikTok
-  void _openTikTok(String username) {
-    // TikTok handles usernames with the '@' symbol in the URL
-    _launchSocial("https://www.tiktok.com/@$username");
+  void _openTwitter(BuildContext context, String handle) {
+    _launchSocial(context, "https://twitter.com/$handle");
   }
 
-  // Function to open WhatsApp
-  // Note: phone number must include country code without '+' or '00'
-  void _openWhatsApp(String phone) {
-    _launchSocial("https://wa.me/$phone");
+  void _openTikTok(BuildContext context, String username) {
+    _launchSocial(context, "https://www.tiktok.com/@$username");
   }
 
-  // Function to open Facebook Profile
-  void _openFacebook(String profileId) {
-    // fb://facade/666 is the deep link for apps, but https works as a fallback
-    _launchSocial("https://www.facebook.com/$profileId");
+  void _openWhatsApp(BuildContext context, String phone) {
+    _launchSocial(context, "https://wa.me/$phone");
+  }
+
+  void _openFacebook(BuildContext context, String profileId) {
+    _launchSocial(context, "https://www.facebook.com/$profileId");
   }
 
   @override
@@ -55,43 +61,37 @@ class SocialButtons extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        // Facebook Icon
         IconButton(
           icon: Icon(Icons.facebook, color: isOneColor ? color : Colors.blue),
-          onPressed: () => _openFacebook("61561449877042"),
+          onPressed: () => _openFacebook(context, "61561449877042"),
         ),
-        // WhatsApp Icon
         IconButton(
           icon: Icon(
             FontAwesomeIcons.whatsapp,
             color: isOneColor ? color : Colors.green,
           ),
-          onPressed: () => _openWhatsApp("2348146269699"), // Your number
+          onPressed: () => _openWhatsApp(context, "2348146269699"),
         ),
-
-        // Instagram Icon
         IconButton(
           icon: FaIcon(
             FontAwesomeIcons.instagram,
             color: isOneColor ? color : Colors.pink,
           ),
-          onPressed: () => _openInstagram("brillo_digitals112"),
+          onPressed: () => _openInstagram(context, "brillo_digitals112"),
         ),
-        // Twitter Icon
         IconButton(
           icon: FaIcon(
             FontAwesomeIcons.xTwitter,
             color: isOneColor ? color : Colors.black,
           ),
-          onPressed: () => _openTwitter("brillodigitals"),
+          onPressed: () => _openTwitter(context, "brillodigitals"),
         ),
-        // TikTok Icon
         IconButton(
           icon: FaIcon(
             FontAwesomeIcons.tiktok,
             color: isOneColor ? color : Colors.black,
           ),
-          onPressed: () => _openTikTok("brillo_digitals"),
+          onPressed: () => _openTikTok(context, "brillo_digitals"),
         ),
       ],
     );

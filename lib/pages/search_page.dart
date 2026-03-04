@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:forecastr/data/constant.dart';
 import 'package:forecastr/data/notifier.dart';
 import 'package:forecastr/data/search_location.dart';
+import 'package:forecastr/data/json_file.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 class SearchPage extends StatefulWidget {
@@ -57,7 +58,23 @@ class _SearchPageState extends State<SearchPage> {
             backgroundColor: kWhiteTransparent,
             triggerMode: RefreshIndicatorTriggerMode.onEdge,
             onRefresh: () async {
-              setState(() {
+              final cityName = widget.city;
+              final lat = cities[cityName]?["lat"];
+              final lon = cities[cityName]?["lon"];
+              if (lat == null || lon == null) return;
+
+              setState(() => isLoading = true);
+              try {
+                final weather = await getSearchedWeatherJson(lat, lon);
+                if (weather != null) {
+                  searchWeatherDataNotifier.value = weather;
+                  getBackGrounds(SearchCurrentWeather().code);
+                }
+              } finally {
+                if (mounted) setState(() => isLoading = false);
+              }
+
+              if (mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Row(
@@ -78,7 +95,7 @@ class _SearchPageState extends State<SearchPage> {
                     duration: Duration(seconds: 2),
                   ),
                 );
-              });
+              }
             },
             child: ListView(
               children: [
@@ -132,6 +149,7 @@ class _SearchPageState extends State<SearchPage> {
                                       ),
                                     ),
                                     Row(
+                                      mainAxisSize: MainAxisSize.min,
                                       children: [
                                         Icon(
                                           Icons.location_on_outlined,
@@ -139,9 +157,12 @@ class _SearchPageState extends State<SearchPage> {
                                           size: 16,
                                         ),
                                         SizedBox(width: 5),
-                                        Text(
-                                          widget.city,
-                                          style: kNormalTextStyle,
+                                        Flexible(
+                                          child: Text(
+                                            widget.city,
+                                            style: kNormalTextStyle,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
                                         ),
                                       ],
                                     ),
@@ -235,63 +256,52 @@ class _SearchPageState extends State<SearchPage> {
                               SingleChildScrollView(
                                 scrollDirection: Axis.horizontal,
                                 child: Row(
-                                  children:
-                                      List.generate(24, (index) {
-                                            return Column(
-                                              children: [
-                                                Text(
-                                                  "${SearchHourlyWeather(0).getTimes()[index]} :",
-                                                  style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: 11,
-                                                    fontWeight: FontWeight.w500,
-                                                  ),
-                                                ),
-                                                Row(
-                                                  children: [
-                                                    getWeatherIcon(
-                                                      SearchHourlyWeather(
-                                                        0,
-                                                      ).getCodes()[index],
-                                                      SearchHourlyWeather(
-                                                        0,
-                                                      ).isNightTime(index),
-                                                    ),
-                                                    SizedBox(width: 5),
-                                                    Text(
-                                                      getTempValue(
-                                                        SearchHourlyWeather(0)
-                                                            .getTemps()[index]
-                                                            .round(),
-                                                      ),
-                                                      style: TextStyle(
-                                                        color: Colors.white,
-                                                        fontSize: 14,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ],
-                                            );
-                                          })
-                                          .expand(
-                                            (element) => [
-                                              element,
-                                              Container(
-                                                margin: EdgeInsets.symmetric(
-                                                  vertical: 1,
-                                                  horizontal: 10,
-                                                ),
-                                                color: Colors.white54,
-                                                width: 1,
-                                                height: 50,
-                                              ),
-                                            ],
-                                          )
-                                          .toList()
-                                        ..removeLast(),
+                                  children: List.generate(24, (index) {
+                                    return Container(
+                                      margin: EdgeInsets.symmetric(
+                                        horizontal: 5,
+                                      ),
+                                      padding: EdgeInsets.all(10),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white.withOpacity(0.05),
+                                        borderRadius: BorderRadius.circular(15),
+                                      ),
+                                      child: Column(
+                                        children: [
+                                          Text(
+                                            "${SearchHourlyWeather(0).getTimes()[index]}",
+                                            style: TextStyle(
+                                              color: Colors.white70,
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                          SizedBox(height: 5),
+                                          getWeatherIcon(
+                                            SearchHourlyWeather(
+                                              0,
+                                            ).getCodes()[index],
+                                            SearchHourlyWeather(
+                                              0,
+                                            ).isNightTime(index),
+                                          ),
+                                          SizedBox(height: 5),
+                                          Text(
+                                            getTempValue(
+                                              SearchHourlyWeather(
+                                                0,
+                                              ).getTemps()[index].round(),
+                                            ),
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  }).toList(),
                                 ),
                               ),
                             ],
