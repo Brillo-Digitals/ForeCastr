@@ -263,7 +263,9 @@ class _SearchPageState extends State<SearchPage> {
                                       ),
                                       padding: EdgeInsets.all(10),
                                       decoration: BoxDecoration(
-                                        color: Colors.white.withOpacity(0.05),
+                                        color: Colors.white.withValues(
+                                          alpha: 0.05,
+                                        ),
                                         borderRadius: BorderRadius.circular(15),
                                       ),
                                       child: Column(
